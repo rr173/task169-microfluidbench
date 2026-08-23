@@ -22,7 +22,6 @@ func NewService(flows *store.FlowStore, topo *topology.Service) *Service {
 
 // CreateStep 创建流程步骤，校验阀门声明覆盖所有受影响的阀门。
 func (s *Service) CreateStep(st *model.FlowStep) (*model.FlowStep, error) {
-	st.FluidType = model.FluidType("sample")
 	if err := model.ValidateStepInput(st.FluidType, st.OrderNo, st.InletID, st.OutletID); err != nil {
 		return nil, err
 	}

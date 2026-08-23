@@ -69,6 +69,9 @@ func ValidateZoneInput(name, reason string) error {
 
 // ValidateStepInput 校验流程步骤字段。
 func ValidateStepInput(fluid FluidType, order int, inlet, outlet int64) error {
+	if !ValidFluidType(fluid) {
+		return NewInvalid("非法流体类型 %q", string(fluid))
+	}
 	if order <= 0 {
 		return NewInvalid("步骤序号必须为正整数")
 	}

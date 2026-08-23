@@ -78,6 +78,12 @@ func TestValidateInputs(t *testing.T) {
 	if err := ValidateStepInput(FluidReagent, 1, 10, 20); err != nil {
 		t.Errorf("合法步骤应通过: %v", err)
 	}
+	if err := ValidateStepInput(FluidType("oil"), 1, 10, 20); err == nil {
+		t.Error("非法流体类型应报错")
+	}
+	if err := ValidateStepInput("", 1, 10, 20); err == nil {
+		t.Error("空流体类型应报错")
+	}
 	if err := ValidateSnapshotTransition(SnapshotBuilding, SnapshotFrozen); err != nil {
 		t.Errorf("合法快照迁移应通过: %v", err)
 	}

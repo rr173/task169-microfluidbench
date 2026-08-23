@@ -42,7 +42,6 @@ func (s *Server) handleCreateStep(w http.ResponseWriter, r *http.Request) {
 		OutletID:  req.OutletID,
 		Valves:    toValveCommands(req.Valves),
 	}
-	st.FluidType = model.FluidType("sample")
 	created, err := s.app.Flow.CreateStep(st)
 	if err != nil {
 		writeErr(w, err)
