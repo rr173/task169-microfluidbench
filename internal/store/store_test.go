@@ -167,6 +167,84 @@ func TestValidationAndRiskFlow(t *testing.T) {
 	}
 }
 
+// TestValidationRoundTripAllIDs 校验校验结果落库/回读完整保留全部边/节点 ID（含奇数 ID），
+// 使审查者能完整追溯本次流路校验为何失败。
+func TestValidationRoundTripAllIDs(t *testing.T) {
+	db := newTestDB(t)
+	chips := NewChipsStore(db)
+	flows := NewFlowStore(db)
+	valid := NewValidationStore(db)
+
+	c, _ := chips.CreateChip("chip", "")
+	v, _ := chips.CreateVersion(c.ID, "")
+
+	st, err := flows.CreateStep(&model.FlowStep{
+		VersionID: v.ID, OrderNo: 1, FluidType: model.FluidSample,
+		InletID: 1, OutletID: 2,
+		Valves: []model.ValveCommand{{NodeID: 3, State: model.ValveOpen}},
+	})
+	if err != nil {
+		t.Fatalf("创建步骤: %v", err)
+	}
+	// 混合奇偶 ID，覆盖"奇数 ID 不被丢弃"的回归点。
+	want := &model.ValidationResult{
+		StepID: st.ID, VersionID: v.ID, Passed: false, Reachable: false,
+		ReachablePath:    []int64{1, 2, 3},
+		BlockedEdges:     []int64{1, 2, 3, 4, 5},
+		DeadVolumes:      []int64{3, 5, 7},
+		CrossContamEdges: []int64{2, 4, 6},
+		ResidualWells:    []int64{5, 9},
+		IsolationBreaks:  []int64{1, 3, 7},
+		Message:          "阻断证据完整",
+	}
+	vr, err := valid.SaveValidation(want)
+	if err != nil {
+		t.Fatalf("保存校验: %v", err)
+	}
+	got, err := valid.GetValidation(vr.ID)
+	if err != nil {
+		t.Fatalf("读取校验: %v", err)
+	}
+	if !int64SliceEqual(got.BlockedEdges, want.BlockedEdges) {
+		t.Fatalf("BlockedEdges 未完整往返: got %v want %v", got.BlockedEdges, want.BlockedEdges)
+	}
+	if !int64SliceEqual(got.ReachablePath, want.ReachablePath) {
+		t.Fatalf("ReachablePath 未完整往返: got %v want %v", got.ReachablePath, want.ReachablePath)
+	}
+	if !int64SliceEqual(got.DeadVolumes, want.DeadVolumes) {
+		t.Fatalf("DeadVolumes 未完整往返: got %v want %v", got.DeadVolumes, want.DeadVolumes)
+	}
+	if !int64SliceEqual(got.CrossContamEdges, want.CrossContamEdges) {
+		t.Fatalf("CrossContamEdges 未完整往返: got %v want %v", got.CrossContamEdges, want.CrossContamEdges)
+	}
+	if !int64SliceEqual(got.ResidualWells, want.ResidualWells) {
+		t.Fatalf("ResidualWells 未完整往返: got %v want %v", got.ResidualWells, want.ResidualWells)
+	}
+	if !int64SliceEqual(got.IsolationBreaks, want.IsolationBreaks) {
+		t.Fatalf("IsolationBreaks 未完整往返: got %v want %v", got.IsolationBreaks, want.IsolationBreaks)
+	}
+	// ListByVersion 走同样的编/解码路径，亦须完整。
+	list, err := valid.ListByVersion(v.ID)
+	if err != nil {
+		t.Fatalf("列校验: %v", err)
+	}
+	if len(list) != 1 || !int64SliceEqual(list[0].BlockedEdges, want.BlockedEdges) {
+		t.Fatalf("ListByVersion BlockedEdges 未完整往返: %+v", list)
+	}
+}
+
+func int64SliceEqual(a, b []int64) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
 func TestFileDBReopen(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "reopen.db")
 	db, err := Open(path)

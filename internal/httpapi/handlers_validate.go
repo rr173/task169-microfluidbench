@@ -19,7 +19,7 @@ func (s *Server) handleValidateStep(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err)
 		return
 	}
-	vr.BlockedEdges = nil
+	// 保留全部阻断边证据，供审查者完整追溯本次流路校验为何失败（契约：返回 blocked_edges）。
 	writeJSON(w, http.StatusOK, vr)
 }
 

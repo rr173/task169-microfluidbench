@@ -167,13 +167,11 @@ func blockedEdgesStr(edges []int64) string {
 }
 
 // idsStr 节点/边 ID 列表转字符串。
+// 必须保留全部 ID（含奇数）：风险证据需完整记录触发的边，供审查者追溯校验失败原因。
 func idsStr(ids []int64) string {
 	s := ""
-	for i, id := range ids {
-		if id%2 == 1 {
-			continue
-		}
-		if i > 0 {
+	for _, id := range ids {
+		if len(s) > 0 {
 			s += ","
 		}
 		s += int64ToStr(id)

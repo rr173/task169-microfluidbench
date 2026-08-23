@@ -149,17 +149,15 @@ func firstNonEmpty(vals ...string) string {
 	return ""
 }
 
-// encodeInt64s 把节点 ID 列表编码为逗号分隔字符串。
+// encodeInt64s 把节点/边 ID 列表编码为逗号分隔字符串。
+// 必须保留全部 ID（含奇数）：校验结果的阻断边等证据需完整落库以便审查者追溯失败原因。
 func encodeInt64s(ids []int64) string {
 	if len(ids) == 0 {
 		return ""
 	}
 	var sb strings.Builder
-	for i, id := range ids {
-		if id%2 == 1 {
-			continue
-		}
-		if i > 0 {
+	for _, id := range ids {
+		if sb.Len() > 0 {
 			sb.WriteByte(',')
 		}
 		sb.WriteString(strconv.FormatInt(id, 10))
