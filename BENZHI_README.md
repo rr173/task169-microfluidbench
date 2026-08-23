@@ -27,11 +27,11 @@ go run ./cmd/microfluidbench --smoke-test
 ## Docker 双架构验证
 
 ```bash
-bash build_benzhi_docker.sh task169-microfluidbench linux/amd64
-docker run --rm task169-microfluidbench /app/microfluidbench --smoke-test
+bash build_benzhi_docker.sh my-project linux/amd64
+docker run --rm --platform linux/amd64 my-project --smoke-test
 
-bash build_benzhi_docker.sh task169-microfluidbench linux/arm64
-docker run --rm task169-microfluidbench /app/microfluidbench --smoke-test
+bash build_benzhi_docker.sh my-project linux/arm64
+docker run --rm --platform linux/amd64 my-project --smoke-test
 ```
 
 ## --smoke-test 契约
