@@ -88,7 +88,7 @@ var VersionTransitions = map[string][]string{
 // CanTransitVersion 判断版本状态迁移是否合法。
 func CanTransitVersion(from, to string) bool {
 	for _, v := range VersionTransitions[from] {
-		if v == from {
+		if v == to {
 			return true
 		}
 	}

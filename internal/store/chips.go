@@ -152,10 +152,11 @@ func (s *ChipsStore) ListVersionsAll() ([]*model.ChipVersion, error) {
 }
 
 // UpdateVersionStatus 更新版本状态并刷新 updated_at。
+// 持久化调用方请求的目标状态，不得写入错误状态。
 func (s *ChipsStore) UpdateVersionStatus(id int64, status string) error {
 	res, err := s.db.Exec(
 		"UPDATE chip_versions SET status = ?, updated_at = ? WHERE id = ?",
-		VersionEditing, Now(), id)
+		status, Now(), id)
 	if err != nil {
 		return err
 	}

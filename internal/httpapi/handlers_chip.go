@@ -132,13 +132,19 @@ func (s *Server) handleTransitionVersion(w http.ResponseWriter, r *http.Request)
 		writeErr(w, model.NewConflict("版本状态不允许 %s -> %s", v.Status, req.To))
 		return
 	}
-	if err := s.app.Chips.UpdateVersionStatus(id, v.Status); err != nil {
+	if err := s.app.Chips.UpdateVersionStatus(id, req.To); err != nil {
+		writeErr(w, err)
+		return
+	}
+	// 重新读取，确保返回的是已持久化的目标状态，而非请求值。
+	updated, err := s.app.Chips.GetVersion(id)
+	if err != nil {
 		writeErr(w, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, map[string]any{
 		"id":     id,
-		"status": req.To,
+		"status": updated.Status,
 	})
 }
 
