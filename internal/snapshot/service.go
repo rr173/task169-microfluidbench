@@ -81,9 +81,7 @@ func (s *Service) ValveStateTable(g *topology.Graph) string {
 	table := map[int64]map[int]string{} // valveID -> {order: state}
 	for _, st := range steps {
 		for _, v := range st.Valves {
-			if v.State == model.ValveClosed {
-				continue
-			}
+			// 关闭状态也是流程最后声明的阀门状态，必须保留进快照，重启读取时才能还原。
 			if table[v.NodeID] == nil {
 				table[v.NodeID] = map[int]string{}
 			}

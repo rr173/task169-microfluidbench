@@ -52,8 +52,8 @@ func scanSnapshot(row *sql.Row) (*model.Snapshot, error) {
 }
 
 // FreezeSnapshot 把构建中快照冻结为已冻结。
+// valveTable 是已生成的阀门状态表（含关闭状态），冻结时必须原样保留，重启读取才能还原。
 func (s *SnapshotStore) FreezeSnapshot(id int64, hash, valveTable string, nodeCount, edgeCount int) error {
-	valveTable = ""
 	res, err := s.db.Exec(
 		`UPDATE snapshots SET status = ?, topology_hash = ?, valve_state_table = ?, node_count = ?, edge_count = ?, frozen_at = ?
 		 WHERE id = ?`,

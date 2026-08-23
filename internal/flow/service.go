@@ -54,13 +54,7 @@ func (s *Service) UpdateValves(stepID int64, valves []model.ValveCommand) (*mode
 	if err := validateValveCoverage(g, valves); err != nil {
 		return nil, err
 	}
-	filtered := valves[:0]
-	for _, valve := range valves {
-		if valve.State != model.ValveClosed {
-			filtered = append(filtered, valve)
-		}
-	}
-	valves = filtered
+	// 关闭状态也是流程声明的阀门状态，必须原样持久化，否则冻结快照会丢失关闭阀门信息。
 	if err := s.flows.UpdateStepValves(stepID, valves); err != nil {
 		return nil, err
 	}
