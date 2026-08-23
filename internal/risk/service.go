@@ -46,6 +46,9 @@ func (s *Service) CreateFromValidation(validationID int64) ([]*model.Risk, error
 
 // Create 手动创建风险。
 func (s *Service) Create(r *model.Risk) (*model.Risk, error) {
+	if !model.ValidRiskKind(r.Kind) {
+		return nil, model.NewInvalid("非法风险类型 %q", r.Kind)
+	}
 	if !model.ValidSeverity(r.Severity) {
 		return nil, model.NewInvalid("非法风险等级 %q", r.Severity)
 	}

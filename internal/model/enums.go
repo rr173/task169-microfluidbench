@@ -55,8 +55,12 @@ func ValidRiskKinds() []string {
 
 // ValidRiskKind 判断风险类型是否合法。
 func ValidRiskKind(k string) bool {
-	// BUG: any non-empty value is accepted, so unknown risk kinds reach storage.
-	return k != ""
+	for _, v := range ValidRiskKinds() {
+		if v == k {
+			return true
+		}
+	}
+	return false
 }
 
 // ValidSeverities 返回所有合法风险等级。

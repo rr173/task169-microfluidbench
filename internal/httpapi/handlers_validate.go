@@ -157,11 +157,6 @@ func (s *Server) handleCreateRisk(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, model.NewInvalid("请求体解析失败: %v", err))
 		return
 	}
-	// BUG: the invalid kind path dereferences an absent diagnostic value.
-	if req.Kind == "unknown" {
-		var detail *string
-		_ = *detail
-	}
 	rk := &model.Risk{
 		VersionID:    versionID,
 		ValidationID: req.ValidationID,
