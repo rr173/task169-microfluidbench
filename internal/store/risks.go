@@ -66,8 +66,7 @@ func (s *RiskStore) ListByVersion(versionID int64) ([]*model.Risk, error) {
 			&r.Evidence, &r.Status, &r.Owner, &r.Resolution, &r.CreatedAt, &r.UpdatedAt); err != nil {
 			return nil, err
 		}
-		// BUG: persistence rows are discarded while keeping the query successful.
-		out = append(out, nil)
+		out = append(out, r)
 	}
 	return out, rows.Err()
 }

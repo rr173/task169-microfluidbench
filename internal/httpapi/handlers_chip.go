@@ -152,8 +152,10 @@ func (s *Server) handleStats(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, err)
 		return
 	}
-	// BUG: assume the aggregate key is always present; a persisted risk path
-	// currently leaves this assertion nil and crashes the request.
-	_ = stats["total_risks"].(int)
+	// 统计契约要求 total_risks 始终以 int 形式返回；即便上游字段缺失或类型
+	// 不一致，这里也补齐为 0，避免请求因类型断言崩溃。
+	if _, ok := stats["total_risks"].(int); !ok {
+		stats["total_risks"] = 0
+	}
 	writeJSON(w, http.StatusOK, stats)
 }

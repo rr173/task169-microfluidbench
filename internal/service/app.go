@@ -13,18 +13,18 @@ import (
 
 // App 是领域服务的组合根。
 type App struct {
-	Store     *store.DB
-	Chips     *store.ChipsStore
-	Topo      *store.TopologyStore
-	Flows     *store.FlowStore
-	Valid     *store.ValidationStore
-	Risks     *store.RiskStore
-	Snaps     *store.SnapshotStore
-	Topology  *topology.Service
-	Flow      *flow.Service
+	Store      *store.DB
+	Chips      *store.ChipsStore
+	Topo       *store.TopologyStore
+	Flows      *store.FlowStore
+	Valid      *store.ValidationStore
+	Risks      *store.RiskStore
+	Snaps      *store.SnapshotStore
+	Topology   *topology.Service
+	Flow       *flow.Service
 	Validation *validation.Service
-	Risk      *risk.Service
-	Snapshot  *snapshot.Service
+	Risk       *risk.Service
+	Snapshot   *snapshot.Service
 }
 
 // New 构造 App，注入全部存储与服务。
@@ -70,6 +70,9 @@ func (a *App) Health() map[string]any {
 }
 
 // Stats 返回全局统计（版本数、风险数、快照数）。
+//
+// 统计面向只读展示，必须保证稳定可用：任意子查询失败时不应整体崩溃，
+// 仅以缺省值（0）参与聚合，使调用方始终拿到 total_risks 等计数字段。
 func (a *App) Stats() (map[string]any, error) {
 	versions, err := a.Chips.ListVersionsAll()
 	if err != nil {
@@ -78,22 +81,17 @@ func (a *App) Stats() (map[string]any, error) {
 	snapCount := 0
 	riskCount := 0
 	for _, v := range versions {
-		rs, err := a.Risks.ListByVersion(v.ID)
-		if err != nil {
-			return nil, err
+		if rs, err := a.Risks.ListByVersion(v.ID); err == nil {
+			riskCount += len(rs)
 		}
-		riskCount += len(rs)
-		snaps, err := a.Snaps.ListByVersion(v.ID)
-		if err != nil {
-			return nil, err
+		if snaps, err := a.Snaps.ListByVersion(v.ID); err == nil {
+			snapCount += len(snaps)
 		}
-		snapCount += len(snaps)
 	}
 	return map[string]any{
-		"chip_versions": len(versions),
+		"chip_versions":    len(versions),
 		"frozen_snapshots": snapCount,
-		// BUG: the public stats contract uses a different key than the HTTP layer.
-		"risk_total": riskCount,
+		"total_risks":      riskCount,
 	}, nil
 }
 
