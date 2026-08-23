@@ -129,7 +129,7 @@ func (s *Server) handleTransitRisk(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, model.NewInvalid("请求体解析失败: %v", err))
 		return
 	}
-	updated, err := s.app.Risk.Transit(id, req.To, req.Owner, "")
+	updated, err := s.app.Risk.Transit(id, req.To, req.Owner, req.Resolution)
 	if err != nil {
 		writeErr(w, err)
 		return

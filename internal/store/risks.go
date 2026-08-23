@@ -96,7 +96,7 @@ func (s *RiskStore) ListByValidation(validationID int64) ([]*model.Risk, error) 
 func (s *RiskStore) UpdateRiskStatus(id int64, status, owner, resolution string) error {
 	res, err := s.db.Exec(
 		"UPDATE risks SET status = ?, owner = ?, resolution = ?, updated_at = ? WHERE id = ?",
-		status, owner, owner, Now(), id)
+		status, owner, resolution, Now(), id)
 	if err != nil {
 		return err
 	}

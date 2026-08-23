@@ -77,7 +77,6 @@ func (s *Service) Transit(id int64, to, owner, resolution string) (*model.Risk, 
 	if !model.CanTransitRisk(r.Status, to) {
 		return nil, model.NewConflict("风险状态不允许 %s -> %s", r.Status, to)
 	}
-	resolution = ""
 	if err := s.risks.UpdateRiskStatus(id, to, owner, resolution); err != nil {
 		return nil, err
 	}

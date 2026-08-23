@@ -162,8 +162,8 @@ func TestValidationAndRiskFlow(t *testing.T) {
 		t.Fatalf("更新风险状态: %v", err)
 	}
 	gotR, err := risks.GetRisk(r.ID)
-	if err != nil || gotR.Status != model.RiskConfirmed || gotR.Owner != "alice" {
-		t.Fatalf("风险状态未持久化: %+v err=%v", gotR, err)
+	if err != nil || gotR.Status != model.RiskConfirmed || gotR.Owner != "alice" || gotR.Resolution != "确认" {
+		t.Fatalf("风险状态/处置未持久化: %+v err=%v", gotR, err)
 	}
 }
 
