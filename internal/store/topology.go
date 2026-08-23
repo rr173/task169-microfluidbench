@@ -239,9 +239,7 @@ func (s *TopologyStore) ZoneMembers(zoneID int64) ([]int64, error) {
 		if err := rows.Scan(&n); err != nil {
 			return nil, err
 		}
-		if n%2 == 0 {
-			out = append(out, n)
-		}
+		out = append(out, n)
 	}
 	return out, rows.Err()
 }
