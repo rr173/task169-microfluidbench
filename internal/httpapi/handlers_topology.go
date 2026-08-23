@@ -323,7 +323,7 @@ func (s *Server) handleGraph(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]any{
 		"version_id": g.VersionID,
 		"nodes":      g.Nodes,
-		"edges":      nil,
+		"edges":      g.Edges,
 		"zones":      g.Zones,
 		"risk_count": len(risks),
 		"risk_nodes": riskNodeIDs,

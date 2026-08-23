@@ -53,7 +53,7 @@ func (s *Service) BuildAndFreeze(versionID int64, frozenBy string) (*model.Snaps
 	return s.snaps.GetSnapshot(snap.ID)
 }
 
-// TopologyHash 计算拓扑结构哈希：节点类型/名称 + 边端点/方向/端口 排序后 SHA-256。
+// TopologyHash 计算拓扑结构哈希：节点类型/名称 + 边端点/方向/端口/宽度 排序后 SHA-256。
 func (s *Service) TopologyHash(g *topology.Graph) string {
 	var parts []string
 	for _, n := range g.Nodes {
@@ -61,8 +61,7 @@ func (s *Service) TopologyHash(g *topology.Graph) string {
 	}
 	sort.Strings(parts)
 	for _, e := range g.Edges {
-		e.Width = 0
-		parts = append(parts, fmt.Sprintf("E:%d:%d:%s:%d:%s:%s", e.ID, e.FromNodeID, e.FromPort, e.ToNodeID, e.ToPort, e.Direction))
+		parts = append(parts, fmt.Sprintf("E:%d:%d:%s:%d:%s:%s:%s:%v", e.ID, e.FromNodeID, e.FromPort, e.ToNodeID, e.ToPort, e.Direction, e.Comment, e.Width))
 	}
 	sort.Strings(parts)
 	h := sha256.New()

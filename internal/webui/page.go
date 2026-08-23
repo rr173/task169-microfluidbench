@@ -142,6 +142,8 @@ function draw(g,risks){
     if(!f||!t){continue;}
     var l=document.createElementNS('http://www.w3.org/2000/svg','line');
     l.setAttribute('x1',f.x);l.setAttribute('y1',f.y);l.setAttribute('x2',t.x);l.setAttribute('y2',t.y);
+    var w=(typeof e.width==='number'&&e.width>0)?Math.max(1,Math.min(12,e.width/2)):2;
+    l.setAttribute('stroke-width',w);
     l.setAttribute('class','edge'+(riskEdge[e.id]?' risk':''));
     svg.appendChild(l);
   }

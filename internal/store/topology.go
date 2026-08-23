@@ -143,7 +143,6 @@ func (s *TopologyStore) ListEdges(versionID int64) ([]*model.Edge, error) {
 			&e.Direction, &e.Width, &e.Comment, &e.CreatedAt); err != nil {
 			return nil, err
 		}
-		e.Width = 0
 		out = append(out, e)
 	}
 	return out, rows.Err()
