@@ -102,7 +102,7 @@ func ClosedValves(st *model.FlowStep) []int64 {
 }
 
 // RunnableEdges 返回在给定阀门状态下可通行的边集合。
-// 规则：边任意一侧是阀门且该阀门关闭 -> 不可通行。
+// 规则：关闭阀门阻断其连接的全部通道（入向与出向均不可通行）。
 func RunnableEdges(g *topology.Graph, st *model.FlowStep) map[int64]bool {
 	runnable := map[int64]bool{}
 	closed := map[int64]bool{}
@@ -110,7 +110,8 @@ func RunnableEdges(g *topology.Graph, st *model.FlowStep) map[int64]bool {
 		closed[nid] = true
 	}
 	for _, e := range g.Edges {
-		if closed[e.FromNodeID] {
+		// 阀门关闭阻断以该阀门为任一端点的边：出向(from)与入向(to)都不可通行。
+		if closed[e.FromNodeID] || closed[e.ToNodeID] {
 			continue
 		}
 		runnable[e.ID] = true

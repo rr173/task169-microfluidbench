@@ -128,7 +128,7 @@ func bfs(adj map[int64][]struct {
 	return true, path
 }
 
-// collectBlocked 返回导致路径阻断的边（关闭阀门所在边）。
+// collectBlocked 返回被关闭阀门阻断的通道（阀门任一侧关闭即阻断：含入向与出向）。
 func collectBlocked(g *topology.Graph, st *model.FlowStep) []int64 {
 	closed := map[int64]bool{}
 	for _, nid := range flow.ClosedValves(st) {
@@ -136,7 +136,7 @@ func collectBlocked(g *topology.Graph, st *model.FlowStep) []int64 {
 	}
 	var out []int64
 	for _, e := range g.Edges {
-		if closed[e.FromNodeID] {
+		if closed[e.FromNodeID] || closed[e.ToNodeID] {
 			out = append(out, e.ID)
 		}
 	}

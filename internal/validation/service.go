@@ -108,7 +108,7 @@ func (s *Service) ValidateAll(versionID int64) (bool, error) {
 // SuggestRisk 根据校验结果自动生成风险建议（供风险模块消费）。
 func (s *Service) SuggestRisk(vr *model.ValidationResult) []model.Risk {
 	var out []model.Risk
-	if len(vr.BlockedEdges) > 1 {
+	if !vr.Reachable {
 		out = append(out, model.Risk{
 			VersionID:    vr.VersionID,
 			ValidationID: vr.ID,
